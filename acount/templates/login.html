@@ -1,0 +1,45 @@
+{% load bootstrap4 %}
+
+
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login</title>
+    {% bootstrap_css %}
+
+
+{% bootstrap_javascript jquery='full' %}
+
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-lg-4"></div>
+            <div class="col-md-6 col-lg-4">
+                <br><br><br><br>
+                <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Login</h5>
+        <form action="." method="post" class="form">
+
+
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-block btn-lg btn-primary">Login</button>
+    {% endbuttons %}
+</form>
+      </div>
+    </div>
+
+            </div>
+            <div class="col-md-3 col-lg-4"></div>
+        </div>
+    </div>
+</body>
+</html>

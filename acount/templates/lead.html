@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ lead }}
+
+{% endblock %}
+{% block page %}
+    <style>
+    form label{
+        width: 100%;
+    }
+    .planning-box{
+        max-height: 800px;
+        overflow: scroll;
+    }
+
+    </style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-4 col-md-3">
+    <div class="card">
+  <div class="card-header"><h3 style="margin: 0">
+        #{{ lead.id }}  {{ lead }}
+
+  </h3>
+  </div><!--cart-header-->
+  <div class="card-body">
+  <div class="row">
+      <div class="col">    <span> Created date</span>
+       <h6>{{ lead.date|date:"d.m.y/H:i" }}</h6> </div>
+      <!-- /.col -->  <div class="col"><span> Updated date</span>
+       <h6>{{ lead.update|date:"d.m.y/H:i" }}</h6></div>
+      <!-- /.col -->
+  </div>
+  <!-- /.row -->
+
+      <form class="form" action="/ajaxUpdateLead/">
+              {% csrf_token %}
+        <div class="alert alert-success" role="alert" style="display: none">
+</div>
+          <input type="hidden" name="id" value="{{ lead.id }}">
+{% if user.role == "ADM" or user.role == "CLS" %}
+          {% if user.role == "ADM"%}
+          <div class="form-group">
+
+                <label for="">
+                    <span> Closer</span>
+                    <input type="text" class="form-control" placeholder="Jon Snow" value="{{ lead.manager.closer }}" disabled required>
+                </label>
+            </div>
+              {% endif %}
+       <div class="form-group">
+                <label for="">
+                    <span>Manager</span>
+                    <select class="form-control" name="manager"
+                            {% if user.role != "ADM" and user.role != "CLS" %}disabled{% endif %}
+                            required>
+{% for manager in managers  %}
+                        <option value="{{ manager.id }}" {% if lead.manager == manager %}selected{% endif %}>{{manager}}</option>
+                    {% endfor %}
+
+                    </select>
+
+
+                </label>
+            </div>
+      {% endif %}
+       <div class="form-group">
+                <label for="">
+                    <span>Client status</span>
+                    <select class="form-control" name="status" {% if user.role == "SLS" %}disabled{% endif %} required>
+                        <option value="new" {% if lead.status == 'new' %}selected{% endif %}>New</option>
+                        <option value="account fixing" {% if lead.status == 'account fixing' %}selected{% endif %}>Account fixing</option>
+                        <option value="not interested" {% if lead.status == 'not interested' %}selected{% endif %}>Not interested</option>
+                        <option value="deposit" {% if lead.status == 'deposit' %}selected{% endif %}>Deposit</option>
+                        <option value="registered" {% if lead.status == 'registered' %}selected{% endif %}>Registered</option>
+                        <option value="waiting" {% if lead.status == 'waiting' %}selected{% endif %}>Waiting</option>
+                        <option value="sales work" {% if lead.status == 'sales work' %}selected{% endif %}>Sales work</option>
+
+                    </select>
+
+
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="">
+                    <span> Full name</span>
+                    <input type="text" class="form-control" name="full_name" placeholder="Jon Snow" value="{{ lead.full_name }}" required>
+                </label>
+            </div>
+          <div class="form-group">
+                <label for="">
+                    <span> Phone</span>
+                <div class="input-group">
+      <input class="form-control py-2" type="text" name="phone" placeholder="+79549999999" {% if user.role != "ADM" and user.role != "CLS" %}disabled{% endif %} value="{{ lead.phone }}" required>
+      <span class="input-group-append">
+        <button class="btn btn-outline-primary copy-form" type="button">
+            <i class="far fa-copy"></i>
+        </button>
+      </span>
+</div>
+                </label>
+            </div>
+          <div class="form-group">
+                <label for="">
+                    <span> About client</span>
+                    <textarea type="text" class="form-control" name="about_client" required rows="4" placeholder="Something about client">{{ lead.about_client }}</textarea>
+
+
+                </label>
+            </div>
+          <div class="form-group">
+                <label for="">
+                    <span>Source</span>
+                    <textarea type="text" class="form-control" name="source" required rows="3" placeholder="Something about client">{{ lead.source }}</textarea>
+
+
+                </label>
+            </div>
+
+          <button type="submit" class="btn btn-primary btn-lg">
+              Save
+          </button>
+      </form>
+  </div><!--card-body-->
+</div><!--card-->
+        </div><!--col-->
+
+
+                <div class="col-lg-8 col-md-9">
+
+    <div class="card">
+  <div class="card-header"><h3 style="margin: 0">
+Planning
+  </h3>
+
+  </div><!--cart-header-->
+  <div class="card-body">
+  <div class="row">
+      <div class="col-md-4">
+             <form action="/ajaxCreatePlanning/" class="form-comment form">
+          {% csrf_token %}
+             <div class="alert alert-danger" role="alert" style="display: none">
+</div>
+          <input type="hidden" name="id" value="{{ lead.id }}">
+
+                 <div class="form-group">
+                <label for="">
+                    <span>Planning type</span>
+                    <select class="form-control" name="type"required>
+                        <option>First call</option>
+                        {% if user.role != "SLS" %}
+                        <option>Callback</option>
+                        <option>Platform show</option>
+                        <option>Account fixing</option>
+                        <option>Trial deal</option>
+                        <option>Deposit</option>
+                    {% endif %}
+
+                    </select>
+
+
+                </label>
+
+            </div>
+              <div id="container" style="margin: 10px 0 15px 0; height: 255px; position: relative"></div>
+                                <input id="datepicker-always-visible" style="display: none" type="text" class="form-control" name="date" data-zdp_readonly_element="false">
+              <br>
+           <button type="submit" class="btn btn-lg btn-block btn-primary">
+              Create
+          </button>
+
+
+
+      </form>
+      </div>
+  <div class="col-md-8">
+        <br>
+
+    <div class="planning-box">
+{% if planning  %}
+        {% for i in planning %}
+        <div class="card card-body">
+            <p class="h6">{{ i.type }} <span class="badge {% if i.active %}badge-success{% else %}badge-danger{% endif %}">{% if i.active %}Done{% else %}Wait{% endif %}</span></p>
+        <small class="text-muted">Creator:{{ i.creator}}•Responsible:{{ i.manager }}</small>
+              <small class="text-muted">Created:{{ i.date|date:"d.m.y/H:i" }}•Time:{{ i.update|date:"d.m.y/H:i" }}{% if i.finished %}•Finished:{{ i.finished|date:"d.m.y/H:i" }}{% endif %}</small>{{ i.comment }}
+        {% if not i.active and user.role != "SLS"%}
+            <br>
+            <form action="/ajaxUpdatePlanning/" class="form" >
+                <div class="alert alert-danger" role="alert" style="display: none"></div>
+
+            <div class="form-group">
+
+                <textarea placeholder="Text some comment..." rows="2"class="form-control" name="comment"></textarea>
+            </div>
+          <input type="hidden" name="id" value="{{ i.id }}">
+{% csrf_token %}
+             <button type="submit" class="btn btn-sm btn-success">
+              Finish
+          </button>
+            </form>
+        {% endif %}
+        </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+    <div class="card card-body">
+    <p class="h5">Oops..</p>
+    Create your first planning
+    </div>
+    <!-- /.card card-body -->
+    {% endif %}
+    </div>
+  </div>
+  <!-- /.col-md-8 -->
+  </div>
+  <!-- /.row -->
+
+  </div><!--card-body-->
+</div><!--card-->
+        </div><!--col-->
+        </div><!--row-->
+    </div> <!--container-->
+
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/zebra_datepicker@latest/dist/css/bootstrap/zebra_datepicker.min.css">
+<script
+  src="https://cdn.jsdelivr.net/npm/zebra_datepicker@latest/dist/zebra_datepicker.min.js"></script>
+      <script>
+    $( document ).ready(function() {
+           $('#datepicker-always-visible').Zebra_DatePicker({
+        always_visible: $('#container'),
+               {#    direction: true,#}
+
+                       format: 'd/m/Y H:i'
+
+    });
+
+        $('.form').submit(function (e) {
+                e.preventDefault();
+                      var form = $(this);
+                        var buttonText = form.find('button[type="submit"]').text();
+$.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: form.serialize(),
+        beforeSend: function(){
+          form.find('button[type="submit"]').prop('disabled', true).text('Wait...');
+        }
+      })
+      .done(function(response) {
+        console.log(response)
+          if(response=='ok'){
+                            document.location.reload()
+
+
+
+          }
+         else {
+                       form.find('.alert').show()
+              form.find('.alert').text(response)
+          }
+
+      })
+      .fail(function() {})
+      .always(function() {
+        console.log("complete");
+        form.find('button[type="submit"]').prop('disabled', false).text(buttonText);
+      })
+
+        })
+});
+    </script>
+{% endblock %}

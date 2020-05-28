@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% block title %}
+    Planning
+{% endblock %}
+{% block page %}
+    <style>
+    form label{
+        width: 100%;
+    }
+    </style>
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col">
+        <p>
+  <button class="btn btn-success" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+  Filters
+  </button> <a href="/planning/" class="btn  btn-outline-success" >
+  Reset filters
+  </a>
+</p>
+<div class="collapse" id="collapseExample">
+            <div class="card card-body">
+
+    <form class="form-filter" action="" method="get">
+      <div class="alert alert-danger" role="alert" style="display: none">
+          Choose some filter
+
+</div>
+        <div class="row">
+            <div class="col-md col-sm-12">
+                <div class="form-group">
+                    <label for="">
+                        <span>
+                           #
+                        </span>
+                                <input value="{{ get.lead__id }}" type="text" class="form-control" placeholder="123" name="lead__id">
+
+                    </label>
+                </div>
+            </div>
+            <div class="col-md col-sm-12">
+                <div class="form-group">
+                    <label for="">
+                        <span>
+                           Name
+                        </span>
+        <input value="{{ get.lead__full_name__icontains }}" type="text" class="form-control" placeholder="Jon" name="lead__full_name__icontains">
+
+                    </label>
+                </div>
+            </div>
+            <div class="col-md col-sm-12">
+                 <div class="form-group">
+                <label for="">
+                    <span>Type</span>
+                    <select class="form-control" name="type">
+                        <option value=""> Choose</option>
+                  <option {% if get.type == "First call" %} selected{% endif %} >First call</option>
+                        <option {% if get.type == "Callback" %} selected{% endif %}>Callback</option>
+                        <option {% if get.type == "Platform show" %} selected{% endif %}>Platform show</option>
+                        <option {% if get.type == "Account fixing" %} selected{% endif %}>Account fixing</option>
+                        <option {% if get.type == "Trial deal" %} selected{% endif %}>Trial deal</option>
+                        <option {% if get.type == "Deposit" %} selected{% endif %}>Deposit</option>
+                    </select>
+
+
+                </label>
+            </div>
+            </div>
+         {% if user.role == "ADM" or user.role == "CLS"%}
+            <div class="col-md col-sm-12">
+                 <div class="form-group">
+                <label for="">
+                    <span>Manager </span>
+                    <select class="form-control" name="lead__manager" >
+                        <option value=""> Choose</option>
+                    {% for m in SLS %}
+                        <option value="{{ m.id }}" {% if get.lead__manager == m.id|stringformat:'d' %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+
+                    </select>
+
+
+                </label>
+            </div>
+            </div>
+        {% endif %}
+        {% if user.role == "ADM" %}
+            <div class="col-md col-sm-12">
+                 <div class="form-group">
+                <label for="">
+                    <span>Closer</span>
+                    <select class="form-control" name="manager" >
+                        <option value=""> Choose</option>
+                    {% for m in CLS %}
+                        <option value="{{ m.id }}" {% if get.manager == m.id|stringformat:'d' %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+
+                    </select>
+
+
+                </label>
+            </div>
+            </div>
+                    {% endif %}
+
+            <div class="col-md col-sm-12">
+                 <div class="form-group">
+                                     <span for="">
+                                         Time
+                                     </span>
+               <div class="input-daterange input-group" id="datepicker">
+    <input type="text" class="input-sm form-control" value="{% if start %}{{ start }}{% endif %}" name="start" placeholder="dd/mm/yyyy" autocomplete="off"/>
+    <span class="input-group-addon">/</span>
+    <input type="text" class="input-sm form-control" value="{% if end %}{{ end }}{% endif %}"  name="end" placeholder="dd/mm/yyyy" autocomplete="off"/>
+</div>
+            </div>
+            </div>
+
+        </div>
+        <button  class="btn btn-success">Filter</button>
+    </form>
+
+
+            </div>
+
+    <br>
+</div>
+           <div class="card">
+  <div class="card-header row align-items-center justify-content-between" style="margin: 0 0 15px 0"><h3 style="margin: 0">
+      Planning
+  </h3>
+
+  </div>
+  <div class="card-body">
+      <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Id</th>
+          <th scope="col">Full name</th>
+      <th scope="col">Phone</th>
+
+      <th scope="col">Type</th>
+      <th scope="col">Created</th>
+      <th scope="col">Time</th>
+      <th scope="col">Creator</th>
+              {% if user.role == "ADM" %}
+      <th scope="col">Closer</th>
+        {% endif %}
+              <th scope="col">Status</th>
+
+    </tr>
+  </thead>
+  <tbody>
+
+
+  {% for p in plans %}
+      {% if not p.active  %}
+    <tr>
+      <th >{{ p.lead.id }}</th>
+          <td><a href="/lead/{{ p.lead.id }}">{{p.lead.full_name}}</a></td>
+      <td><span class="text">{{p.lead.phone}}</span> <button class="copy btn btn-outline-primary btn-sm"><i class="far fa-copy"></i></button></td>
+
+      <td>{{p.type}}</td>
+
+      <td>{{ p.date|date:"d.m.y/H:i" }}</td>
+      <td>{{ p.update|date:"d.m.y/H:i" }}</td>
+      <td>{{p.creator}}</td>
+                      {% if user.role == "ADM" %}
+
+      <td>{{p.manager.closer}}</td>
+                {% endif %}
+
+
+
+      <td>
+
+          <span class="badge badge-pill
+           {% if p.active%}
+                badge-success
+
+{% else %}
+badge-danger
+
+
+{% endif %}
+
+" style="text-transform: capitalize">    {% if p.active%}
+                Done
+
+{% else %}
+Wait
+
+{% endif %}</span>
+
+
+
+      </td>
+
+    </tr>
+      {% endif %}
+{% endfor %}
+  </tbody>
+</table>
+  {% if plans.has_other_pages %}
+  <nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+
+    <li class="page-item {% if not plans.has_previous %}disabled{% endif %}">
+      {% if plans.has_previous %}
+      <a class="page-link" href="?page={{ plans.previous_page_number }}{% if filter_url %}&{{ filter_url }}{% endif %}" tabindex="-1" aria-disabled="true">Previous</a>
+          {% else %}
+      <span class="page-link" tabindex="-1" aria-disabled="true">Previous</span>
+
+          {% endif %}
+    </li>
+
+  {% for i in plans.paginator.page_range %}
+      {% if plans.number == i %}
+              <li class="page-item active"><a class="page-link" href="#">{{ i }} <span class="sr-only">(current)</a></li>
+      {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{ i }}{% if filter_url %}&{{ filter_url }}{% endif %}">{{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+
+
+    <li class="page-item {% if not plans.has_next %}disabled{% endif %}">
+    {% if plans.has_next %}
+      <a class="page-link" href="?page={{ plans.next_page_number }}{% if filter_url %}&{{ filter_url }}{% endif %}">Next</a>
+        {% else %}
+      <span class="page-link" ">Next</span>
+
+        {% endif %}
+    </li>
+
+  </ul>
+</nav>
+  {% endif %}
+    {% if not plans %}
+        <h4>No Events
+</h4>
+  {% endif %}
+  </div>
+</div>
+        </div>
+    </div>
+    </div>
+
+
+    <br>
+
+    <link rel="stylesheet" href="/static/css/bootstrap-datepicker3.min.css">
+    <script src="/static/js/bootstrap-datepicker.min.js"></script>
+    <script>
+    $( document ).ready(function() {
+        $('.input-daterange').datepicker({
+            format:"dd/mm/yyyy"
+
+});
+        $('.finish-btn').click(function (e) {
+            var id=$(this).data('id');
+            $('.inputId').val(id);
+            $('#exampleModalLabel span').text("#"+id);
+
+        })
+        $('.form').submit(function (e) {
+                e.preventDefault();
+                      var form = $(this);
+                        var buttonText = form.find('button[type="submit"]').text();
+$.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: form.serialize(),
+        beforeSend: function(){
+          form.find('button[type="submit"]').prop('disabled', true).text('Wait...');
+        }
+      })
+      .done(function(response) {
+        console.log(response)
+            if(response=='Bad request'){
+                        form.find('.alert').show()
+              form.find('.alert').text(response)
+
+          }else {
+              document.location.reload()
+          }
+
+      })
+      .fail(function() {})
+      .always(function() {
+        console.log("complete");
+        form.find('button[type="submit"]').prop('disabled', false).text(buttonText);
+      })
+
+        })
+        $('.form-filter').submit(
+
+            function (e) {
+                e.preventDefault();
+                var form = $(this);
+
+$(':input', this).each(function() {
+        this.disabled = !($(this).val());
+    });
+var url = form.serialize();
+
+        if (url.length>=1){
+                location.href = "?"+url
+
+        }
+        else {
+$(':input', this).each(function() {
+        this.disabled = ($(this).val());
+    });
+        form.find('.alert').show()
+        }
+
+            }
+        )
+
+});
+    </script>
+{% endblock %}
+
+
+
+
+

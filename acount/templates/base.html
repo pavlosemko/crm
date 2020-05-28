@@ -1,0 +1,65 @@
+{% load bootstrap4 %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
+    {% bootstrap_css %}
+
+
+{% bootstrap_javascript jquery='full' %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css" integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V" crossorigin="anonymous">
+    <style>
+        .alertMessage{
+            position: fixed;
+            right: 10px;
+            top: 10px;
+            z-index: 999999;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="alert alertMessage alert-success alert-dismissible" role="alert">
+    <span class="text"></span>
+     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <a class="navbar-brand" href="/">CRM</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item {% if active == "home" %} active{% endif %}">
+        <a class="nav-link" href="/">Leads</a>
+      </li>   <li class="nav-item {% if active == "plan" %} active{% endif %}">
+        <a class="nav-link" href="/planning/">Planning</a>
+      </li>
+
+
+    </ul>
+          <span class="navbar-text">Hello! {{ user }}&nbsp;&nbsp;</span>
+       <a href="/logout/" class="btn btn-outline-light my-2 my-sm-0" type="submit">Logout</a>
+
+
+
+  </div>
+</nav>
+<br><br>
+
+{% block page %}
+{% endblock %}
+<br><br>
+<script src="/static/js/main.js?v=1"></script>
+</body>
+</html>
